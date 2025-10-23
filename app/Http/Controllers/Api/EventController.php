@@ -13,7 +13,7 @@ class EventController extends Controller
      */
     public function index()
     {
-        //
+        return Event::all();
     }
 
     /**
@@ -29,7 +29,7 @@ class EventController extends Controller
      */
     public function show(Event $event)
     {
-        //
+        return $event;
     }
 
     /**
