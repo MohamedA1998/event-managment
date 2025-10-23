@@ -14,5 +14,13 @@ class EventSeeder extends Seeder
      */
     public function run(): void
     {
+        $users = User::all();
+
+        for ($i = 0; $i < 200; $i++) {
+            $user = $users->random();
+            \App\Models\Event::factory()->create([
+                'user_id' => $user->id
+            ]);
+        }
     }
 }
