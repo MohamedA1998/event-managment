@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreEveentRequest;
+use App\Http\Requests\UpdateEventRequest;
 use App\Models\Event;
 use Illuminate\Http\Request;
 
@@ -19,9 +21,14 @@ class EventController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreEveentRequest $request)
     {
-        //
+        Event::create([
+            ...$request->validated(),
+            'user_id' => 1
+        ]);
+
+        return response()->json(['message' => 'Event created successfully']);
     }
 
     /**
@@ -35,9 +42,11 @@ class EventController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Event $event)
+    public function update(UpdateEventRequest $request, Event $event)
     {
-        //
+        $event->update($request->validated());
+
+        return $event;
     }
 
     /**
@@ -45,6 +54,8 @@ class EventController extends Controller
      */
     public function destroy(Event $event)
     {
-        //
+        $event->delete();
+
+        return response(status: 204);
     }
 }
