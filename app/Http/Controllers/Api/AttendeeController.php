@@ -2,19 +2,28 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\CanLoadRelationships;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\AttendeeResource;
 use App\Models\Attendee;
 use App\Models\Event;
 use Illuminate\Http\Request;
 
 class AttendeeController extends Controller
 {
+    use CanLoadRelationships;
+
+    private array $relations = ['user'];
     /**
      * Display a listing of the resource.
      */
     public function index(Event $event)
     {
-        return $event->attendees()->latest()->paginate(10)->toResourceCollection();
+        $attendees = $this->loadRelationships(
+            $event->attendees()->latest()
+        );
+
+        return $attendees->paginate(10)->toResourceCollection();
     }
 
     /**
@@ -26,7 +35,7 @@ class AttendeeController extends Controller
             'user_id' => 1
         ]);
 
-        return $attendee->toResource();
+        return $this->loadRelationships($attendee)->toResource();
     }
 
     /**
@@ -34,7 +43,7 @@ class AttendeeController extends Controller
      */
     public function show(Event $event, Attendee $attendee)
     {
-        return $attendee->toResource();
+        return $this->loadRelationships($attendee)->toResource();
     }
 
     /**
