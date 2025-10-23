@@ -15,7 +15,7 @@ class EventController extends Controller
      */
     public function index()
     {
-        return Event::all();
+        return Event::with('user')->get()->toResourceCollection();
     }
 
     /**
@@ -23,12 +23,12 @@ class EventController extends Controller
      */
     public function store(StoreEveentRequest $request)
     {
-        Event::create([
+        $event = Event::create([
             ...$request->validated(),
             'user_id' => 1
         ]);
 
-        return response()->json(['message' => 'Event created successfully']);
+        return $event->toResource();
     }
 
     /**
@@ -36,7 +36,7 @@ class EventController extends Controller
      */
     public function show(Event $event)
     {
-        return $event;
+        return $event->load('user', 'attendees')->toResource();
     }
 
     /**
@@ -46,7 +46,7 @@ class EventController extends Controller
     {
         $event->update($request->validated());
 
-        return $event;
+        return $event->toResource();
     }
 
     /**
