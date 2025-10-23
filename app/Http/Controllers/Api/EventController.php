@@ -6,9 +6,7 @@ use App\CanLoadRelationships;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreEveentRequest;
 use App\Http\Requests\UpdateEventRequest;
-use App\Http\Resources\EventResource;
 use App\Models\Event;
-use Illuminate\Http\Request;
 
 class EventController extends Controller
 {
@@ -23,7 +21,7 @@ class EventController extends Controller
     {
         $query = $this->loadRelationships(Event::query());
 
-        return $query->paginate(10)->toResourceCollection();
+        return $query->latest()->paginate(10)->toResourceCollection();
     }
 
     /**
