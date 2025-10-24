@@ -8,12 +8,22 @@ use App\Http\Resources\AttendeeResource;
 use App\Models\Attendee;
 use App\Models\Event;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class AttendeeController extends Controller
+class AttendeeController extends Controller implements HasMiddleware
 {
     use CanLoadRelationships;
 
     private array $relations = ['user'];
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:api', ['store', 'destroy']),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */
