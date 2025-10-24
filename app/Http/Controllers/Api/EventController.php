@@ -7,12 +7,21 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreEveentRequest;
 use App\Http\Requests\UpdateEventRequest;
 use App\Models\Event;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class EventController extends Controller
+class EventController extends Controller implements HasMiddleware
 {
     use CanLoadRelationships;
 
     private array $relations = ['user', 'attendees', 'attendees.user'];
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:api', except: ['index', 'show']),
+        ];
+    }
 
     /**
      * Display a listing of the resource.
@@ -31,7 +40,7 @@ class EventController extends Controller
     {
         $event = Event::create([
             ...$request->validated(),
-            'user_id' => 1
+            'user_id' => auth()->guard('api')->id(),
         ]);
 
         return $this->loadRelationships($event)->toResource();
