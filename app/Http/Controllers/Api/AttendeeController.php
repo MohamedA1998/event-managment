@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\CanLoadRelationships;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\AttendeeResource;
 use App\Models\Attendee;
 use App\Models\Event;
 use Illuminate\Http\Request;
@@ -29,6 +28,8 @@ class AttendeeController extends Controller implements HasMiddleware
      */
     public function index(Event $event)
     {
+        $this->authorize('viewAny', Attendee::class);
+
         $attendees = $this->loadRelationships(
             $event->attendees()->latest()
         );
@@ -41,8 +42,10 @@ class AttendeeController extends Controller implements HasMiddleware
      */
     public function store(Request $request, Event $event)
     {
+        $this->authorize('create', Attendee::class);
+        
         $attendee = $event->attendees()->create([
-            'user_id' => 1
+            'user_id' => auth()->guard('api')->id(),
         ]);
 
         return $this->loadRelationships($attendee)->toResource();
@@ -53,6 +56,8 @@ class AttendeeController extends Controller implements HasMiddleware
      */
     public function show(Event $event, Attendee $attendee)
     {
+        $this->authorize('view', $attendee);
+
         return $this->loadRelationships($attendee)->toResource();
     }
 
@@ -61,6 +66,8 @@ class AttendeeController extends Controller implements HasMiddleware
      */
     public function destroy(Event $event, Attendee $attendee)
     {
+        $this->authorize('delete', $attendee);
+
         $attendee->delete();
 
         return response(status: 204);

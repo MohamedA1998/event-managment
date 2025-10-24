@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\CanLoadRelationships;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreEveentRequest;
+use App\Http\Requests\StoreEventRequest;
 use App\Http\Requests\UpdateEventRequest;
 use App\Models\Event;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -28,6 +28,8 @@ class EventController extends Controller implements HasMiddleware
      */
     public function index()
     {
+        $this->authorize('viewAny', Event::class);
+
         $query = $this->loadRelationships(Event::query());
 
         return $query->latest()->paginate(10)->toResourceCollection();
@@ -36,8 +38,10 @@ class EventController extends Controller implements HasMiddleware
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreEveentRequest $request)
+    public function store(StoreEventRequest $request)
     {
+        $this->authorize('create', Event::class);
+
         $event = Event::create([
             ...$request->validated(),
             'user_id' => auth()->guard('api')->id(),
@@ -51,6 +55,8 @@ class EventController extends Controller implements HasMiddleware
      */
     public function show(Event $event)
     {
+        $this->authorize('view', $event);
+
         return $this->loadRelationships($event)->toResource();
     }
 
@@ -59,6 +65,8 @@ class EventController extends Controller implements HasMiddleware
      */
     public function update(UpdateEventRequest $request, Event $event)
     {
+        $this->authorize('update', $event);
+
         $event->update($request->validated());
 
         return $this->loadRelationships($event)->toResource();
@@ -69,6 +77,8 @@ class EventController extends Controller implements HasMiddleware
      */
     public function destroy(Event $event)
     {
+        $this->authorize('delete', $event);
+
         $event->delete();
 
         return response(status: 204);
