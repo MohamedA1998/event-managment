@@ -20,6 +20,7 @@ class AttendeeController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('auth:api', ['store', 'destroy']),
+            new Middleware('throttle:api', ['store', 'destroy'])
         ];
     }
 
